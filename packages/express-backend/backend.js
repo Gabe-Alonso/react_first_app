@@ -41,6 +41,33 @@ const findUserByName = (name) => {
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
+const addUser = (user) => {
+    users["users_list"].push(user);
+    return user;
+};
+
+const deleteUser = (id) => {
+    users["users_list"] = users["users_list"].filter(user => user.id !== id);
+};
+  
+app.delete("/users", (req, res) => {
+    const userToRemove = req.body;
+    console.log(userToRemove);
+    deleteUser(userToRemove);
+    res.send();
+});
+  
+app.get("/users", (req, res) => {
+    const name = req.query.name;
+    const id = req.query.id;
+    if (name != undefined && id != undefined) {
+        result = users["users_list"].filter(user => user.name !== name);
+        result = result.filter(user => user.id !== id);
+        res.send(result);
+    } else {
+      res.send(users);
+    }
+});
 
   
 app.get("/users", (req, res) => {
@@ -62,7 +89,14 @@ app.get("/users/:id", (req, res) => {
     } else {
       res.send(result);
     }
-  });
+});
+
+app.post("/users", (req, res) => {
+    const userToAdd = req.body;
+    console.log(userToAdd);
+    addUser(userToAdd);
+    res.send();
+});
 
 app.use(express.json());
 
