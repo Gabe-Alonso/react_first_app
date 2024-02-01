@@ -43,6 +43,14 @@ const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
 const addUser = (user) => {
+    console.log(user);
+    if (user["id"] == undefined){
+        console.log("Im in")
+        const id = Math.random().toString();
+        console.log(id);
+        user.id = id;
+    }
+
     users["users_list"].push(user);
     return user;
 };
@@ -72,7 +80,6 @@ app.get("/users", (req, res) => {
 app.get("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
     let result = findUserById(id);
-    console.log(result);
     if (result === undefined) {
       res.status(404).send("Resource not found.");
     } else {
