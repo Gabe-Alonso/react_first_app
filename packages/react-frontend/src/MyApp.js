@@ -23,12 +23,13 @@ import Form from "./Form";
         </div>
       );
 
-      function updateList(person) { 
+      function updateList(person) {        
         postUser(person)
-          .then(() => setCharacters([...characters, person]))
+          .then((response) => response.json()
+            .then((newPerson) => setCharacters([...characters, newPerson])))
           .catch((error) => {
-            console.log(error);
-          })
+            console.error(error);
+          });
       }
 
       function fetchUsers() {
@@ -38,8 +39,11 @@ import Form from "./Form";
 
     useEffect(() => {
       fetchUsers()
-        .then((res) => res.json())
-        .then((json) => setCharacters(json["users_list"]))
+        .then((res) => {
+          if (res.status === 201){
+            res.json().then((json) => setCharacters(json["users_list"]))
+          }          
+        })
         .catch((error) => { console.log(error); });
     }, [] );
     
