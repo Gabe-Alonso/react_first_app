@@ -93,6 +93,7 @@ app.post("/users", (req, res) => {
 });
 
 app.delete("/users", (req, res) => {
+    console.log(req.body.id);
     const userToRemove = req.body.id;
     deleteUser(userToRemove);
     res.status(204).send();

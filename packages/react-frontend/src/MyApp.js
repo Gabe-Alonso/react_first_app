@@ -7,22 +7,25 @@ import Form from "./Form";
     const [characters, setCharacters] = useState([]);
 
     function removeOneCharacter(index) {
-      //console.log();
-      const id = characters[index]["id"];
-        /*deleteUser(id).then((response) => {if(response.status === 204){
+      const person = characters[index]
+        deleteUser(person).then((response) => {if(response.status === 204){
           const updated = characters.filter((character, i) => {
             return i !== index;
           });
           setCharacters(updated);
-        }});*/
-
-        const updated = characters.filter((character, i) => {
-          return i !== index;
-        });
-        setCharacters(updated);
-
+        }});
         
       }
+
+      useEffect(() => {
+        fetchUsers()
+          .then((res) => {
+            if (res.status === 200){
+              res.json().then((json) => setCharacters(json["users_list"]))
+            }          
+          })
+          .catch((error) => { console.log(error); });
+      }, [] );
   
       return (
         <div className="container">
@@ -38,8 +41,9 @@ import Form from "./Form";
         postUser(person)
           .then((response) => response.json()
             .then((newPerson) => {
-              console.log(newPerson["id"]);
-              setCharacters([...characters, newPerson]);}
+              if(response.status === 201){
+                setCharacters([...characters, newPerson]);}
+            }
             ))
           .catch((error) => {
             console.error(error);
@@ -51,15 +55,7 @@ import Form from "./Form";
         return promise;
       }
 
-    useEffect(() => {
-      fetchUsers()
-        .then((res) => {
-          if (res.status === 201){
-            res.json().then((json) => setCharacters(json["users_list"]))
-          }          
-        })
-        .catch((error) => { console.log(error); });
-    }, [] );
+    
     
     function postUser(person) {
       const promise = fetch("Http://localhost:8000/users", {
@@ -75,13 +71,13 @@ import Form from "./Form";
     
   
 
-  function deleteUser(id) {
+  function deleteUser(person) {
     const promise = fetch("Http://localhost:8000/users", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(id),
+      body: JSON.stringify(person),
     });
 
     return promise;
