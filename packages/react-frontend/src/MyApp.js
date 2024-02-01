@@ -7,10 +7,21 @@ import Form from "./Form";
     const [characters, setCharacters] = useState([]);
 
     function removeOneCharacter(index) {
+      //console.log();
+      const id = characters[index]["id"];
+        /*deleteUser(id).then((response) => {if(response.status === 204){
+          const updated = characters.filter((character, i) => {
+            return i !== index;
+          });
+          setCharacters(updated);
+        }});*/
+
         const updated = characters.filter((character, i) => {
           return i !== index;
         });
         setCharacters(updated);
+
+        
       }
   
       return (
@@ -23,10 +34,13 @@ import Form from "./Form";
         </div>
       );
 
-      function updateList(person) {        
+      function updateList(person){        
         postUser(person)
           .then((response) => response.json()
-            .then((newPerson) => setCharacters([...characters, newPerson])))
+            .then((newPerson) => {
+              console.log(newPerson["id"]);
+              setCharacters([...characters, newPerson]);}
+            ))
           .catch((error) => {
             console.error(error);
           });
@@ -59,7 +73,21 @@ import Form from "./Form";
       return promise;
     }
     
+  
+
+  function deleteUser(id) {
+    const promise = fetch("Http://localhost:8000/users", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(id),
+    });
+
+    return promise;
   }
+  
+}
 
   
 

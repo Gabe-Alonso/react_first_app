@@ -45,9 +45,7 @@ const findUserById = (id) =>
 const addUser = (user) => {
     console.log(user);
     if (user["id"] == undefined){
-        console.log("Im in")
         const id = Math.random().toString();
-        console.log(id);
         user.id = id;
     }
 
@@ -90,14 +88,14 @@ app.get("/users/:id", (req, res) => {
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
     const user = addUser(userToAdd);
-    console.log(user);
+    //console.log(user);
     res.status(201).send(user);
 });
 
 app.delete("/users", (req, res) => {
     const userToRemove = req.body.id;
     deleteUser(userToRemove);
-    res.send();
+    res.status(204).send();
 });
 
 app.get("/", (req, res) => {
@@ -111,7 +109,6 @@ app.listen(port, () => {
 });
 
 app.get("/users?name=:name/:id", (req, res) => {
-    console.log("Tryna get user by name and id\n");
     const name = req.query.name;
     const id = req.query.id;
     if (name != undefined && id != undefined) {
