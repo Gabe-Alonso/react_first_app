@@ -23,14 +23,18 @@ import Form from "./Form";
         </div>
       );
 
-      function updateList(person) {
-        setCharacters([...characters, person]);
+      function updateList(person) { 
+        postUser(person)
+          .then(() => setCharacters([...characters, person]))
+          .catch((error) => {
+            console.log(error);
+          })
       }
 
       function fetchUsers() {
         const promise = fetch("http://localhost:8000/users");
         return promise;
-    }
+      }
 
     useEffect(() => {
       fetchUsers()
@@ -38,6 +42,18 @@ import Form from "./Form";
         .then((json) => setCharacters(json["users_list"]))
         .catch((error) => { console.log(error); });
     }, [] );
+    
+    function postUser(person) {
+      const promise = fetch("Http://localhost:8000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(person),
+      });
+  
+      return promise;
+    }
     
   }
 

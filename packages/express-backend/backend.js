@@ -82,14 +82,13 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    console.log(userToAdd);
     addUser(userToAdd);
+    res.status(201);
     res.send();
 });
 
 app.delete("/users", (req, res) => {
     const userToRemove = req.body.id;
-    console.log(userToRemove);
     deleteUser(userToRemove);
     res.send();
 });
