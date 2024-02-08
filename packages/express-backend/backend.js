@@ -1,60 +1,34 @@
 import express from "express";
 import cors from "cors";
+import userServices from "./user-services.js";
 
 const app = express();
 const port = 8000;
-const users = {
-    users_list: [
-      {
-        id: "xyz789",
-        name: "Charlie",
-        job: "Janitor"
-      },
-      {
-        id: "abc123",
-        name: "Mac",
-        job: "Bouncer"
-      },
-      {
-        id: "ppp222",
-        name: "Mac",
-        job: "Professor"
-      },
-      {
-        id: "yat999",
-        name: "Dee",
-        job: "Aspring actress"
-      },
-      {
-        id: "zap555",
-        name: "Dennis",
-        job: "Bartender"
-      }
-    ]
-  };
+
 
 const findUserByName = (name) => {
-    return users["users_list"].filter(
-      (user) => user["name"] === name
-    );
+    return userServices.findUserByName(name);
 };
 
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
+const findUserById = (_id) =>
+    userServices.findUserById(_id);
+
+const findUserByJob = (job) =>
+    userServices.findUserByJob(job);
 
 const addUser = (user) => {
     console.log(user);
-    if (user["id"] == undefined){
-        const id = Math.random().toString();
-        user.id = id;
+    if (user["_id"] == undefined){
+        const _id = Math.random().toString();
+        user._id = _id;
     }
 
-    users["users_list"].push(user);
+    userServices.addUser(user);
     return user;
 };
 
-const deleteUser = (id) => {
-    users["users_list"] = users["users_list"].filter(user => user.id !== id);
+const deleteUser = (_id) => {
+    userServices.deleteUser(_id);
 };
 
 app.use(cors());
@@ -66,37 +40,35 @@ app.use(express.json());
   
 app.get("/users", (req, res) => {
     const name = req.query.name;
-    if (name != undefined) {
-      let result = findUserByName(name);
-      result = { users_list: result };
-      res.send(result);
-    } else {
-      res.send(users);
-    }
+    const job = req.query.job;
+    userServices.getUsers(name, job).then((result) => {
+      res.send({users_list: result})
+    }).catch((error) => {console.error(error); });
+
 });
 
 app.get("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-      res.status(404).send("Resource not found.");
-    } else {
-      res.send(result);
-    }
+    const _id = req.params["id"]; //or req.params.id
+    console.log(_id);
+    userServices.findUserById(_id).then((result) => {
+      res.send({users_list: result});
+    }).catch((error) => {console.error(error); });
 });
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    const user = addUser(userToAdd);
-    //console.log(user);
-    res.status(201).send(user);
+    //userServices.addUser(userToAdd).then(res.status(201).send(res.body))
+    //  .catch((error) => { console.log(error); });
+      userServices.addUser(userToAdd).then((result) => {
+        res.status(201).send(result.body);
+      }).catch((error) => {console.error(error); });
 });
 
 app.delete("/users", (req, res) => {
-    console.log(req.body.id);
-    const userToRemove = req.body.id;
-    deleteUser(userToRemove);
-    res.status(204).send();
+    const userToRemove = req.body._id;
+    userServices.deleteUser(userToRemove).then((result) => {
+      res.status(204).send();
+    }).catch((error) => {console.error(error); });
 });
 
 app.get("/", (req, res) => {
@@ -109,14 +81,12 @@ app.listen(port, () => {
   );
 });
 
-app.get("/users?name=:name/:id", (req, res) => {
-    const name = req.query.name;
-    const id = req.query.id;
-    if (name != undefined && id != undefined) {
-        result = users["users_list"].filter(user => user.name !== name);
-        result = result.filter(user => user.id !== id);
-        res.send(result);
-    } else {
-        res.send(users);
-    }
+app.get("/users?name:name&job=:job", (req, res) => {
+  const name = req.query.name;
+  const job = req.query.job;
+  console.log(req.query.name);
+  console.log(req.query.job);
+  userServices.getUsers(name, job).then((result) => {
+    res.send({users_list: result})
+  }).catch((error) => {console.error(error); });
 });
